@@ -16,8 +16,6 @@ import matplotlib.animation as animation
 from matplotlib import style
 
 
-
-
 def sound_alarm(path):
 	# play an alarm sound
 	pygame.mixer.init()
@@ -116,7 +114,8 @@ vs = VideoStream(src=0).start()
 time.sleep(1.0)
 
 
-
+f = open('test.txt', 'r+')
+f.truncate()
 
 # loop over frames from the video stream
 while True:
@@ -165,6 +164,13 @@ while True:
 		#
 		file = open("test.txt","a")
 		file.write(str(frameNumber) + "," + str(ear) +"\n")
+
+		if(frameNumber > 100):
+			with open('test.txt', 'r') as fin:
+			    data = fin.read().splitlines(True)
+			with open('test.txt', 'w') as fout:
+			    fout.writelines(data[1:])
+
 		
 
 
@@ -231,7 +237,6 @@ while True:
 
 
 # do a bit of cleanup
-f = open('test.txt', 'r+')
-f.truncate()
+
 cv2.destroyAllWindows()
 vs.stop()

@@ -49,20 +49,33 @@ fig = plt.figure()
 ax1 = fig.add_subplot(1,1,1)
 
 def animate(i):
-    graph_data = open('test.txt', 'r').read()
-    lines = graph_data.split('\n')
-    xs = []
-    ys = []
-    for line in lines:
-        if len(line) > 1:
-            x, y = line.split(',')
-            xs.append(x)
-            ys.append(y)
-    ax1.clear()
+	EYE_AR_THRESH = 0.3
+	EYE_AR_CONSEC_FRAMES = 48
+	COUNTER = 0
+	graph_data = open('test.txt', 'r').read()
+	lines = graph_data.split('\n')
+	xs = []
+	ys = []
+	colors = []
+	for line in lines:
+		if len(line) > 1:
+			x, y = line.split(',')
+			if float(y) < EYE_AR_THRESH:
+				COUNTER += 1
+				if COUNTER >= EYE_AR_CONSEC_FRAMES:
+					colors.append('r')
+				else:
+					colors.append('y')
+			else:
+				colors.append('b')
+				COUNTER = 0
+			xs.append(x)
+			ys.append(y)
+	ax1.clear()
+	ax1.plot(xs, ys)
+	plt.axhline(y=0.30, c="red")
+	ax1.scatter(xs, ys, c=colors, marker="o", picker=True)
 
-    ax1.plot(xs, ys)
-    plt.axhline(y=0.30, c="red")
-    ax1.scatter(xs, ys)
 
-ani = animation.FuncAnimation(fig, animate, interval=1000, frames=100)
+ani = animation.FuncAnimation(fig, animate, interval=50, frames=100)
 plt.show()
