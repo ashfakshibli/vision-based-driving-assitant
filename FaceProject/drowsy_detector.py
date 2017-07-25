@@ -51,22 +51,25 @@ fig = plt.figure()
 ax1 = fig.add_subplot(1,1,1)
 
 #animate the plotted data
-def animate(i, frames, ears):
-    # graph_data = open('example.txt', 'r').read()
-    # lines = graph_data.split('\n')
-    xs = frames[:i]
-    ys = ears[:i]
-    # for line in lines:
-    #     if len(line) > 1:
-    #         x, y = line.split(',')
-    #         xs.append(x)
-    #         ys.append(y)
+def animate(i):
+    graph_data = open('test.txt', 'r').read()
+    lines = graph_data.split('\n')
+    xs = []
+    ys = []
+    for line in lines:
+        if len(line) > 1:
+            x, y = line.split(',')
+            xs.append(x)
+            ys.append(y)
     ax1.clear()
-
     ax1.plot(xs, ys)
     plt.axhline(y=EYE_AR_THRESH, c="red")
-    ax1.scatter(xs, ys, marker='<')
+    ax1.scatter(xs, ys)
 
+def animator():
+	print("[INFO] loading graph...")
+	ani = animation.FuncAnimation(fig, animate, interval=50)
+	plt.show()
 
 
 
@@ -92,6 +95,8 @@ EYE_AR_CONSEC_FRAMES = 48
 COUNTER = 0
 ALARM_ON = False
 
+
+
 # initialize dlib's face detector (HOG-based) and then create
 # the facial landmark predictor
 print("[INFO] loading facial landmark predictor...")
@@ -109,6 +114,9 @@ print("[INFO] starting video stream thread...")
 # vs = VideoStream(src=args["webcam"]).start()
 vs = VideoStream(src=0).start()
 time.sleep(1.0)
+
+
+
 
 # loop over frames from the video stream
 while True:
@@ -141,12 +149,26 @@ while True:
 		# average the eye aspect ratio together for both eyes
 		ear = (leftEAR + rightEAR) / 2.0
 
+		# frameNumber = frameNumber + 1
+		# plotAr = np.empty(1)
+		# plotArray = np.append(plotAr, [[frameNumber, ear]])
+
 		frameNumber = frameNumber + 1
-		plotAr = np.empty(1)
-		plotArray = np.append(plotAr, [[frameNumber, ear]])
+		frameArray.append(frameNumber)
+		earArray.append(ear)
+		len1 = len(frameArray)
+		len2 = len(earArray)
+
+		#print(earArray, frameArray)
+		#ani = animation.FuncAnimation(fig, animate, fargs=(frameArray, earArray),  interval=50, blit=True)
+		#plt.show()
+		#
+		file = open("test.txt","a")
+		file.write(str(frameNumber) + "," + str(ear) +"\n")
+		
 
 
-		print(plotArray)
+		# print(plotArray)
 		#ani = animation.FuncAnimation(fig, animate, fargs=(frameArray, earArray),  interval=50)
 		#plt.show()
 
@@ -196,12 +218,20 @@ while True:
  
 	# show the frame
 	cv2.imshow("Frame", frame)
+
+
+
+	
+	
 	key = cv2.waitKey(1) & 0xFF
  
 	# if the `q` key was pressed, break from the loop
 	if key == ord("q"):
 		break
 
+
 # do a bit of cleanup
+f = open('test.txt', 'r+')
+f.truncate()
 cv2.destroyAllWindows()
 vs.stop()
