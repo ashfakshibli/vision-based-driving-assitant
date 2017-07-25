@@ -165,7 +165,7 @@ while True:
 		file = open("test.txt","a")
 		file.write(str(frameNumber) + "," + str(ear) +"\n")
 
-		if(frameNumber > 100):
+		if(frameNumber > 60):
 			with open('test.txt', 'r') as fin:
 			    data = fin.read().splitlines(True)
 			with open('test.txt', 'w') as fout:

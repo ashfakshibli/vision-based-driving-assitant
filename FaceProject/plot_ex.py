@@ -41,7 +41,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib import style
 import numpy as np
-
+import cv2
 
 #style.use('fivethirtyeight')
 
@@ -74,8 +74,9 @@ def animate(i):
 	ax1.clear()
 	ax1.plot(xs, ys)
 	plt.axhline(y=0.30, c="red")
-	ax1.scatter(xs, ys, c=colors, marker="o", picker=True)
+	ax1.scatter(xs, ys, c=colors, marker="s", picker=True)
 
 
 ani = animation.FuncAnimation(fig, animate, interval=50, frames=100)
 plt.show()
+
