@@ -142,14 +142,13 @@ while True:
 		ear = (leftEAR + rightEAR) / 2.0
 
 		frameNumber = frameNumber + 1
-		frameArray.append(frameNumber)
-		earArray.append(ear)
-		len1 = len(frameArray)
-		len2 = len(earArray)
+		plotAr = np.empty(1)
+		plotArray = np.append(plotAr, [[frameNumber, ear]])
 
-		print(earArray, frameArray)
-		ani = animation.FuncAnimation(fig, animate, fargs=(frameArray, earArray),  interval=50, blit=True)
-		plt.show()
+
+		print(plotArray)
+		#ani = animation.FuncAnimation(fig, animate, fargs=(frameArray, earArray),  interval=50)
+		#plt.show()
 
 		# compute the convex hull for the left and right eye, then
 		# visualize each of the eyes
