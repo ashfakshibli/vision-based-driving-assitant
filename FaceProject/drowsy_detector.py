@@ -11,6 +11,13 @@ import time
 import dlib
 import cv2
 
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from matplotlib import style
+
+
+
+
 def sound_alarm(path):
 	# play an alarm sound
 	pygame.mixer.init()
@@ -33,15 +40,45 @@ def eye_aspect_ratio(eye):
 	# return the eye aspect ratio
 	return ear
  
+
+
+
+frameNumber = 0
+earArray = []
+frameArray = []
+
+fig = plt.figure()
+ax1 = fig.add_subplot(1,1,1)
+
+#animate the plotted data
+def animate(i, frames, ears):
+    # graph_data = open('example.txt', 'r').read()
+    # lines = graph_data.split('\n')
+    xs = frames[:i]
+    ys = ears[:i]
+    # for line in lines:
+    #     if len(line) > 1:
+    #         x, y = line.split(',')
+    #         xs.append(x)
+    #         ys.append(y)
+    ax1.clear()
+
+    ax1.plot(xs, ys)
+    plt.axhline(y=EYE_AR_THRESH, c="red")
+    ax1.scatter(xs, ys, marker='<')
+
+
+
+
 # construct the argument parse and parse the arguments
-ap = argparse.ArgumentParser()
-ap.add_argument("-p", "--shape-predictor", required=True,
-	help="path to facial landmark predictor")
-ap.add_argument("-a", "--alarm", type=str, default="",
-	help="path alarm .WAV file")
-ap.add_argument("-w", "--webcam", type=int, default=0,
-	help="index of webcam on system")
-args = vars(ap.parse_args())
+# ap = argparse.ArgumentParser()
+# ap.add_argument("-p", "--shape-predictor", required=True,
+# 	help="path to facial landmark predictor")
+# ap.add_argument("-a", "--alarm", type=str, default="",
+# 	help="path alarm .WAV file")
+# ap.add_argument("-w", "--webcam", type=int, default=0,
+# 	help="index of webcam on system")
+# args = vars(ap.parse_args())
  
 # define two constants, one for the eye aspect ratio to indicate
 # blink and then a second constant for the number of consecutive
@@ -59,7 +96,8 @@ ALARM_ON = False
 # the facial landmark predictor
 print("[INFO] loading facial landmark predictor...")
 detector = dlib.get_frontal_face_detector()
-predictor = dlib.shape_predictor(args["shape_predictor"])
+# predictor = dlib.shape_predictor(args["shape_predictor"])
+predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
 
 # grab the indexes of the facial landmarks for the left and
 # right eye, respectively
@@ -68,11 +106,13 @@ predictor = dlib.shape_predictor(args["shape_predictor"])
 
 # start the video stream thread
 print("[INFO] starting video stream thread...")
-vs = VideoStream(src=args["webcam"]).start()
+# vs = VideoStream(src=args["webcam"]).start()
+vs = VideoStream(src=0).start()
 time.sleep(1.0)
 
 # loop over frames from the video stream
 while True:
+	
 	# grab the frame from the threaded video file stream, resize
 	# it, and convert it to grayscale
 	# channels)
@@ -101,6 +141,16 @@ while True:
 		# average the eye aspect ratio together for both eyes
 		ear = (leftEAR + rightEAR) / 2.0
 
+		frameNumber = frameNumber + 1
+		frameArray.append(frameNumber)
+		earArray.append(ear)
+		len1 = len(frameArray)
+		len2 = len(earArray)
+
+		print(earArray, frameArray)
+		ani = animation.FuncAnimation(fig, animate, fargs=(frameArray, earArray),  interval=50, blit=True)
+		plt.show()
+
 		# compute the convex hull for the left and right eye, then
 		# visualize each of the eyes
 		leftEyeHull = cv2.convexHull(leftEye)
@@ -123,11 +173,11 @@ while True:
 					# check to see if an alarm file was supplied,
 					# and if so, start a thread to have the alarm
 					# sound played in the background
-					if args["alarm"] != "":
-						t = Thread(target=sound_alarm,
-							args=(args["alarm"],))
-						t.deamon = True
-						t.start()
+					# if args["alarm"] != "":
+					t = Thread(target=sound_alarm,
+							args=('alert.wav',))
+					t.deamon = True
+					t.start()
 
 				# draw an alarm on the frame
 				cv2.putText(frame, "DROWSINESS ALERT!", (10, 30),
