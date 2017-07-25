@@ -46,9 +46,12 @@ import cv2
 #style.use('fivethirtyeight')
 
 fig = plt.figure()
+fig.suptitle('Drowsiness Detection Plot', fontsize=14, fontweight='bold')
 ax1 = fig.add_subplot(1,1,1)
 
+
 def animate(i):
+
 	EYE_AR_THRESH = 0.3
 	EYE_AR_CONSEC_FRAMES = 48
 	COUNTER = 0
@@ -67,16 +70,21 @@ def animate(i):
 				else:
 					colors.append('y')
 			else:
-				colors.append('b')
+				colors.append('g')
 				COUNTER = 0
 			xs.append(x)
 			ys.append(y)
 	ax1.clear()
 	ax1.plot(xs, ys)
 	plt.axhline(y=0.30, c="red")
-	ax1.scatter(xs, ys, c=colors, marker="s", picker=True)
+	ax1.scatter(xs, ys, c=colors, marker="o", s=20, picker=True)
+	fig.subplots_adjust(left=0.15)
+	fig.subplots_adjust(bottom=0.15)
+	ax1.set_xlabel('Frame Number')
+	ax1.set_ylabel('EAR (Eye Aspect Ratio)')
 
 
 ani = animation.FuncAnimation(fig, animate, interval=50, frames=100)
+#plt.tight_layout()
 plt.show()
 
