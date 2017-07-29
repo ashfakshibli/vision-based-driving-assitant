@@ -55,7 +55,8 @@ def animate(i):
 	EYE_AR_THRESH = 0.3
 	EYE_AR_CONSEC_FRAMES = 48
 	COUNTER = 0
-	graph_data = open('test.txt', 'r').read()
+	
+	graph_data = open('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test.txt', 'r').read()
 	lines = graph_data.split('\n')
 	xs = []
 	ys = []

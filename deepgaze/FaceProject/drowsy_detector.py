@@ -50,7 +50,7 @@ ax1 = fig.add_subplot(1,1,1)
 
 #animate the plotted data
 def animate(i):
-    graph_data = open('test.txt', 'r').read()
+    graph_data = open('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test.txt', 'r').read()
     lines = graph_data.split('\n')
     xs = []
     ys = []
@@ -100,12 +100,15 @@ ALARM_ON = False
 print("[INFO] loading facial landmark predictor...")
 detector = dlib.get_frontal_face_detector()
 # predictor = dlib.shape_predictor(args["shape_predictor"])
-predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
+predictor = dlib.shape_predictor('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/shape_predictor_68_face_landmarks.dat')
 
 # grab the indexes of the facial landmarks for the left and
 # right eye, respectively
 (lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
 (rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
+(mStart, mEnd) = face_utils.FACIAL_LANDMARKS_IDXS["mouth"]
+(nStart, nEnd) = face_utils.FACIAL_LANDMARKS_IDXS["nose"]
+(m,n) =(1,68)
 
 # start the video stream thread
 print("[INFO] starting video stream thread...")
@@ -114,7 +117,7 @@ vs = VideoStream(src=0).start()
 time.sleep(1.0)
 
 
-f = open('test.txt', 'r+')
+f = open('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test.txt', 'r+')
 f.truncate()
 
 # loop over frames from the video stream
@@ -142,6 +145,9 @@ while True:
 		# coordinates to compute the eye aspect ratio for both eyes
 		leftEye = shape[lStart:lEnd]
 		rightEye = shape[rStart:rEnd]
+		mouth = shape[mStart:mEnd]
+		nose = shape[nStart:nEnd]
+		allpoints = shape[m:n]
 		leftEAR = eye_aspect_ratio(leftEye)
 		rightEAR = eye_aspect_ratio(rightEye)
 
@@ -162,13 +168,13 @@ while True:
 		#ani = animation.FuncAnimation(fig, animate, fargs=(frameArray, earArray),  interval=50, blit=True)
 		#plt.show()
 		#
-		file = open("test.txt","a")
+		file = open("/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test.txt","a")
 		file.write(str(frameNumber) + "," + str(ear) +"\n")
 
 		if(frameNumber > 60):
-			with open('test.txt', 'r') as fin:
+			with open('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test.txt', 'r') as fin:
 			    data = fin.read().splitlines(True)
-			with open('test.txt', 'w') as fout:
+			with open('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test.txt', 'w') as fout:
 			    fout.writelines(data[1:])
 
 		
@@ -182,8 +188,14 @@ while True:
 		# visualize each of the eyes
 		leftEyeHull = cv2.convexHull(leftEye)
 		rightEyeHull = cv2.convexHull(rightEye)
+		mouthHull = cv2.convexHull(mouth)
+		noseHull = cv2.convexHull(nose)
+		allHull = cv2.convexHull(allpoints)
 		cv2.drawContours(frame, [leftEyeHull], -1, (0, 255, 0), 1)
 		cv2.drawContours(frame, [rightEyeHull], -1, (0, 255, 0), 1)
+		cv2.drawContours(frame, [mouthHull], -1, (0, 255, 0), 1)
+		cv2.drawContours(frame, [noseHull], -1, (0, 255, 0), 1)
+		cv2.drawContours(frame, [allHull], -1, (0, 255, 0), 1)
 
 		# check to see if the eye aspect ratio is below the blink
 		# threshold, and if so, increment the blink frame counter
@@ -202,7 +214,7 @@ while True:
 					# sound played in the background
 					# if args["alarm"] != "":
 					t = Thread(target=sound_alarm,
-							args=('alert.wav',))
+							args=('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/alert.wav',))
 					t.deamon = True
 					t.start()
 

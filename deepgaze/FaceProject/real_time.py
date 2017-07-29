@@ -47,6 +47,10 @@ while True:
 		shape = predictor(gray, rect)
 		shape = face_utils.shape_to_np(shape)
 
+
+		# hull = cv2.convexHull(pts)
+		# cv2.drawContours(overlay, [hull], -1, colors[i], -1)
+
 		# loop over the (x, y)-coordinates for the facial landmarks
 		# and draw them on the image
 		for (x, y) in shape:
