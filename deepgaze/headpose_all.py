@@ -48,6 +48,33 @@ P3D_STOMION = numpy.float32([10.0, 0.0, -75.0]) #62
 TRACKED_POINTS = (0, 4, 8, 12, 16, 17, 26, 27, 30, 33, 36, 39, 42, 45, 62)
 ALL_POINTS = list(range(0,68)) #Used for debug only
 
+def isRotationMatrix(R) :
+    Rt = numpy.transpose(R)
+    shouldBeIdentity = numpy.dot(Rt, R)
+    I = numpy.identity(3, dtype = R.dtype)
+    n = numpy.linalg.norm(I - shouldBeIdentity)
+    return n < 1e-6
+
+
+def rotationMatrixToEulerAngles(R) :
+
+    assert(isRotationMatrix(R))
+    
+    sy = math.sqrt(R[0,0] * R[0,0] +  R[1,0] * R[1,0])
+    
+    singular = sy < 1e-6
+
+    if  not singular :
+        x = math.atan2(R[2,1] , R[2,2])
+        y = math.atan2(-R[2,0], sy)
+        z = math.atan2(R[1,0], R[0,0])
+    else :
+        x = math.atan2(-R[1,2], R[1,1])
+        y = math.atan2(-R[2,0], sy)
+        z = 0
+
+    return numpy.array([x, y, z])
+
 
 def main():
 
@@ -292,19 +319,29 @@ def main():
 
                 #print(rmat)
 
-                proMatrix =   numpy.array([[ rmat[0,0], rmat[0,1], rmat[0,2], 0],
-                                           [ rmat[1,0], rmat[1,1], rmat[1,2], 0],
-                                           [ rmat[2,0], rmat[2,1], rmat[2,2], 0] ])
+                # proMatrix =   numpy.array([[ rmat[0,0], rmat[0,1], rmat[0,2], 0],
+                #                            [ rmat[1,0], rmat[1,1], rmat[1,2], 0],
+                #                            [ rmat[2,0], rmat[2,1], rmat[2,2], 0] ])
 
                 #print(proMatrix)
 
                 #euler_angles contain (pitch, yaw, roll)
                 
-                euler_angles = cv2.decomposeProjectionMatrix(proMatrix)
+                euler_angles = rotationMatrixToEulerAngles(rmat)
 
-                yaw = euler_angles[6][1];
-                pitch = euler_angles[6][0];
-                roll = euler_angles[6][2];
+
+                print(euler_angles)
+
+                yaw = math.degrees(euler_angles[1]);
+                pitch = math.degrees(euler_angles[0]);
+                roll = math.degrees(euler_angles[2]);
+                # yaw = math.cos(euler_angles[1]*180/math.pi)
+                # pitch = math.cos(euler_angles[0]*180/math.pi)
+                # roll = math.cos(euler_angles[2]*180/math.pi)
+
+                # yaw = euler_angles[6][1];
+                # pitch = euler_angles[6][0];
+                # roll = euler_angles[6][2];
 
                 print('yaw = '+repr(yaw)+'\n')
                 print('pitch = '+repr(pitch)+'\n')
