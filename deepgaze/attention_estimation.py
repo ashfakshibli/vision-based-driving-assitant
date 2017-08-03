@@ -79,6 +79,8 @@ P3D_STOMION = np.float32([10.0, 0.0, -75.0]) #62
 TRACKED_POINTS = (0, 4, 8, 12, 16, 17, 26, 27, 30, 33, 36, 39, 42, 45, 62)
 ALL_POINTS = list(range(0,68)) #Used for debug only
 
+video_capture = cv2.VideoCapture(0)
+
 
 def isRotationMatrix(R) :
     Rt = np.transpose(R)
@@ -112,7 +114,7 @@ def rotationMatrixToEulerAngles(R) :
 def headPose():
 
     #Defining the video capture object
-    video_capture = cv2.VideoCapture(0)
+    # video_capture = cv2.VideoCapture(0)
 
     if(video_capture.isOpened() == False):
         print("Error: the resource is busy or unvailable")
@@ -465,32 +467,6 @@ frameNumber = 0
 earArray = []
 frameArray = []
 
-fig = plt.figure()
-ax1 = fig.add_subplot(1,1,1)
-
-#animate the plotted data
-def animate(i):
-    graph_data = open('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test.txt', 'r').read()
-    lines = graph_data.split('\n')
-    xs = []
-    ys = []
-    for line in lines:
-        if len(line) > 1:
-            x, y = line.split(',')
-            xs.append(x)
-            ys.append(y)
-    ax1.clear()
-    ax1.plot(xs, ys)
-    plt.axhline(y=EYE_AR_THRESH, c="red")
-    ax1.scatter(xs, ys)
-
-def animator():
-	print("[INFO] loading graph...")
-	ani = animation.FuncAnimation(fig, animate, interval=50)
-	plt.show()
-
-
-
 # construct the argument parse and parse the arguments
 # ap = argparse.ArgumentParser()
 # ap.add_argument("-p", "--shape-predictor", required=True,
@@ -533,8 +509,8 @@ predictor = dlib.shape_predictor('/home/ashfak/Desktop/DriversAssistanceSystem/d
 # start the video stream thread
 print("[INFO] starting video stream thread...")
 # vs = VideoStream(src=args["webcam"]).start()
-vs = VideoStream(src=0).start()
-time.sleep(1.0)
+# vs = VideoStream(src=0).start()
+# time.sleep(1.0)
 
 
 f = open('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test.txt', 'r+')
@@ -546,7 +522,7 @@ while True:
 	# grab the frame from the threaded video file stream, resize
 	# it, and convert it to grayscale
 	# channels)
-	frame = vs.read()
+	frame = video_capture.read()
 	frame = imutils.resize(frame, width=450)
 	gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
@@ -656,9 +632,9 @@ while True:
  
 	# show the frame
 	cv2.imshow("Frame", frame)
-	t1 = Thread(target=headPose)
-	t1.deamon = True
-	t1.start()
+	# t1 = Thread(target=headPose)
+	# t1.deamon = True
+	# t1.start()
 
 
 
