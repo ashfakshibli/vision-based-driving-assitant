@@ -46,7 +46,7 @@ def eye_aspect_ratio(eye):
 
 
 #EAR Code
-frameNumber = 0
+
 earArray = []
 frameArray = []
 
@@ -59,7 +59,7 @@ EYE_AR_CONSEC_FRAMES = 48
 
 # initialize the frame counter as well as a boolean used to
 # indicate if the alarm is going off
-COUNTER = 0
+
 ALARM_ON = False
 
 
@@ -155,6 +155,8 @@ def rotationMatrixToEulerAngles(R) :
 
 
 def main():
+    frameNumber = 0
+    COUNTER = 0
 
     #Defining the video capture object
     # video_capture = cv2.VideoCapture(0)
@@ -298,7 +300,7 @@ def main():
             # plotAr = np.empty(1)
             # plotArray = np.append(plotAr, [[frameNumber, ear]])
 
-            frameNumber = frameNumber + 1
+            # frameNumber = frameNumber + 1
             frameArray.append(frameNumber)
             earArray.append(ear)
             len1 = len(frameArray)
@@ -545,8 +547,8 @@ def main():
                 print('pitch = '+repr(pitch)+'\n')
                 print('roll = '+repr(roll)+'\n')
 
-                cv2.putText(framePose, "YAW: {:.2f}".format(yaw), (300, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-                cv2.putText(framePose, "Pitch: {:.2f}".format(pitch), (300, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                cv2.putText(framePose, "YAW: {:.2f}".format(yaw), (450, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                cv2.putText(framePose, "Pitch: {:.2f}".format(pitch), (450, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
                 # head_pose = [ rmat[0,0], rmat[0,1], rmat[0,2], tvec[0],
                 #               rmat[1,0], rmat[1,1], rmat[1,2], tvec[1],

@@ -113,7 +113,7 @@ predictor = dlib.shape_predictor('/home/ashfak/Desktop/DriversAssistanceSystem/d
 # start the video stream thread
 print("[INFO] starting video stream thread...")
 # vs = VideoStream(src=args["webcam"]).start()
-vs = VideoStream(src=0).start()
+vs = VideoStream(src=1).start()
 time.sleep(1.0)
 
 

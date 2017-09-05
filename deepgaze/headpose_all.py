@@ -81,7 +81,7 @@ def rotationMatrixToEulerAngles(R) :
 def main():
 
     #Defining the video capture object
-    video_capture = cv2.VideoCapture(0)
+    video_capture = cv2.VideoCapture(1)
 
     if(video_capture.isOpened() == False):
         print("Error: the resource is busy or unvailable")

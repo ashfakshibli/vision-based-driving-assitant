@@ -52,7 +52,7 @@ ALL_POINTS = list(range(0,68)) #Used for debug only
 def main():
 
     #Defining the video capture object
-    video_capture = cv2.VideoCapture(0)
+    video_capture = cv2.VideoCapture(1)
 
     if(video_capture.isOpened() == False):
         print("Error: the resource is busy or unvailable")
