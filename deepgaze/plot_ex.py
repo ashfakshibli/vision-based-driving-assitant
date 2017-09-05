@@ -46,7 +46,7 @@ import cv2
 #style.use('fivethirtyeight')
 
 fig = plt.figure()
-fig.suptitle('Drowsiness Detection Plot', fontsize=14, fontweight='bold')
+fig.suptitle('Attention Estimation Plot', fontsize=14, fontweight='bold')
 ax1 = fig.add_subplot(1,1,1)
 
 
@@ -82,7 +82,7 @@ def animate(i):
 	fig.subplots_adjust(left=0.15)
 	fig.subplots_adjust(bottom=0.15)
 	ax1.set_xlabel('Frame Number')
-	ax1.set_ylabel('EAR (Eye Aspect Ratio)')
+	ax1.set_ylabel('Attention Level')
 
 
 ani = animation.FuncAnimation(fig, animate, interval=50, frames=100)

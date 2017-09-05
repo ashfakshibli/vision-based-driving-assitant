@@ -60,7 +60,7 @@ EYE_AR_CONSEC_FRAMES = 48
 # initialize the frame counter as well as a boolean used to
 # indicate if the alarm is going off
 
-ALARM_ON = False
+
 
 
 # initialize dlib's face detector (HOG-based) and then create
@@ -115,7 +115,7 @@ P3D_STOMION = np.float32([10.0, 0.0, -75.0]) #62
 TRACKED_POINTS = (0, 4, 8, 12, 16, 17, 26, 27, 30, 33, 36, 39, 42, 45, 62)
 ALL_POINTS = list(range(0,68)) #Used for debug only
 
-video_capture = cv2.VideoCapture(0)
+video_capture = cv2.VideoCapture(1)
 # time.sleep(1.0)
 
 
@@ -155,8 +155,7 @@ def rotationMatrixToEulerAngles(R) :
 
 
 def main():
-    frameNumber = 0
-    COUNTER = 0
+    
 
     #Defining the video capture object
     # video_capture = cv2.VideoCapture(0)
@@ -255,13 +254,25 @@ def main():
     roi_resize_w = int(cam_w/10)
     roi_resize_h = int(cam_h/10)
 
+
+
+
+
+
+    frameNumber = 0
+    COUNTER = 0
+    ALARM_ON = False
+
+
+
+
     while(True):
 
         # Capture frame-by-frame
         ret, framePose = video_capture.read()
         _,frame = video_capture.read() #ear
-        frame = imutils.resize(frame, width=450)
-        framePose = imutils.resize(framePose, width=800)
+        #frame = imutils.resize(frame, width=450)
+        #framePose = imutils.resize(framePose, width=800)
         gray2 = cv2.cvtColor(framePose[roi_y1:roi_y2, roi_x1:roi_x2], cv2.COLOR_BGR2GRAY)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) #ear
 
@@ -270,7 +281,7 @@ def main():
 
 
         # detect faces in the grayscale frame
-        rects = detector(gray2, 0)
+        rects = detector(gray, 0)
 
 
         # loop over the face detections
@@ -300,7 +311,7 @@ def main():
             # plotAr = np.empty(1)
             # plotArray = np.append(plotAr, [[frameNumber, ear]])
 
-            # frameNumber = frameNumber + 1
+            frameNumber = frameNumber + 1
             frameArray.append(frameNumber)
             earArray.append(ear)
             len1 = len(frameArray)
