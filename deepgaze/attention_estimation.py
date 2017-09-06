@@ -26,6 +26,16 @@ def sound_alarm(path):
 	pygame.mixer.music.load(path)
 	pygame.mixer.music.play()
 
+def mouth_opening(mouth):
+	A = dist.euclidean(mouth[2], mouth[10])
+	B = dist.euclidean(mouth[3], mouth[9])
+	C = dist.euclidean(mouth[4], mouth[8])
+
+	D = (A+B+C)/3
+
+	return D
+
+
 def eye_aspect_ratio(eye):
 	# compute the euclidean distances between the two sets of
 	# vertical eye landmarks (x, y)-coordinates
@@ -55,7 +65,9 @@ frameArray = []
 # frames the eye must be below the threshold for to set off the
 # alarm
 EYE_AR_THRESH = 0.3
+MOUTH_THRESH = 1000.00
 EYE_AR_CONSEC_FRAMES = 48
+MOUTH_CONSEC_FRAMES = 38
 
 # initialize the frame counter as well as a boolean used to
 # indicate if the alarm is going off
@@ -82,7 +94,7 @@ predictor = dlib.shape_predictor('/home/ashfak/Desktop/DriversAssistanceSystem/d
 ######## Head Pose Part Code #########
 #
 #If True enables the verbose mode
-DEBUG = True 
+DEBUG = False 
 
 #Antropometric constant values of the human head. 
 #Found on wikipedia and on:
@@ -115,7 +127,7 @@ P3D_STOMION = np.float32([10.0, 0.0, -75.0]) #62
 TRACKED_POINTS = (0, 4, 8, 12, 16, 17, 26, 27, 30, 33, 36, 39, 42, 45, 62)
 ALL_POINTS = list(range(0,68)) #Used for debug only
 
-video_capture = cv2.VideoCapture(1)
+video_capture = cv2.VideoCapture(0)
 # time.sleep(1.0)
 
 
@@ -166,8 +178,8 @@ def main():
         print("The video source has been opened correctly...")
 
     #Create the main window and move it
-    cv2.namedWindow('Video')
-    cv2.moveWindow('Video', 20, 20)
+    cv2.namedWindow('Assistant Window')
+    cv2.moveWindow('Assistant Window', 20, 20)
 
     #Obtaining the CAM dimension
     cam_w = int(video_capture.get(3))
@@ -350,6 +362,12 @@ def main():
             cv2.drawContours(framePose, [noseHull], -1, (0, 255, 0), 1)
             cv2.drawContours(framePose, [allHull], -1, (0, 255, 0), 1)
 
+            mouth_open = mouth_opening(mouth)
+            # print(mouth_open)
+            cv2.putText(framePose,"Mouth Opening: {:.2f}".format(mouth_open), (10, 400),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+
+
             # check to see if the eye aspect ratio is below the blink
             # threshold, and if so, increment the blink frame counter
             if ear < EYE_AR_THRESH:
@@ -372,7 +390,7 @@ def main():
                         t.start()
 
                     # draw an alarm on the frame
-                    cv2.putText(framePose, "DROWSINESS ALERT!", (10, 30),
+                    cv2.putText(framePose, "Attention ALERT!", (10, 30),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
             # otherwise, the eye aspect ratio is not below the blink
@@ -386,6 +404,7 @@ def main():
             # thresholds and frame counters
             cv2.putText(framePose, "EAR: {:.2f}".format(ear), (300, 30),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            break
 
 
 
@@ -540,7 +559,7 @@ def main():
                 euler_angles = rotationMatrixToEulerAngles(rmat)
 
 
-                print(euler_angles)
+                #print(euler_angles)
 
 
                 yaw = math.degrees(euler_angles[1]);
@@ -554,9 +573,9 @@ def main():
                 # pitch = euler_angles[6][0];
                 # roll = euler_angles[6][2];
 
-                print('yaw = '+repr(yaw)+'\n')
-                print('pitch = '+repr(pitch)+'\n')
-                print('roll = '+repr(roll)+'\n')
+                #print('yaw = '+repr(yaw)+'\n')
+                #print('pitch = '+repr(pitch)+'\n')
+                #print('roll = '+repr(roll)+'\n')
 
                 cv2.putText(framePose, "YAW: {:.2f}".format(yaw), (450, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                 cv2.putText(framePose, "Pitch: {:.2f}".format(pitch), (450, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
@@ -631,7 +650,7 @@ def main():
 
         #Showing the framePose and waiting
         #cv2.imshow("Frame", frame)
-        cv2.imshow("Video", framePose)
+        cv2.imshow("Assistant Window", framePose)
         # for the exit command
         if cv2.waitKey(1) & 0xFF == ord('q'): break
    
