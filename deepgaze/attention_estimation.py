@@ -20,6 +20,11 @@ import matplotlib.animation as animation
 from matplotlib import style
 
 
+
+def mean(numbers):
+    return float(sum(numbers)) / max(len(numbers), 1)
+
+
 def sound_alarm(path):
 	# play an alarm sound
 	pygame.mixer.init()
@@ -65,10 +70,12 @@ frameArray = []
 # frames the eye must be below the threshold for to set off the
 # alarm
 EYE_AR_THRESH = 0.3
-MOUTH_THRESH = 1000.00
-EYE_AR_CONSEC_FRAMES = 48
-MOUTH_CONSEC_FRAMES = 38
-
+MOUTH_THRESH = 20.00
+YAW_THRESH = 6
+PITCH_THRESH = 30
+EYE_AR_CONSEC_FRAMES = 38
+MOUTH_CONSEC_FRAMES = 20
+HEADPOSE_CONSEC_FRAMES = 20
 # initialize the frame counter as well as a boolean used to
 # indicate if the alarm is going off
 
@@ -94,7 +101,7 @@ predictor = dlib.shape_predictor('/home/ashfak/Desktop/DriversAssistanceSystem/d
 ######## Head Pose Part Code #########
 #
 #If True enables the verbose mode
-DEBUG = False 
+DEBUG = True 
 
 #Antropometric constant values of the human head. 
 #Found on wikipedia and on:
@@ -127,7 +134,7 @@ P3D_STOMION = np.float32([10.0, 0.0, -75.0]) #62
 TRACKED_POINTS = (0, 4, 8, 12, 16, 17, 26, 27, 30, 33, 36, 39, 42, 45, 62)
 ALL_POINTS = list(range(0,68)) #Used for debug only
 
-video_capture = cv2.VideoCapture(0)
+video_capture = cv2.VideoCapture(1)
 # time.sleep(1.0)
 
 
@@ -268,12 +275,16 @@ def main():
 
 
 
-
-
-
     frameNumber = 0
     COUNTER = 0
     ALARM_ON = False
+
+    MCOUNTER = 0
+
+
+    ypCOUNTER = 0
+    yaw_angle_displacement = []
+    pitch_angle_displacement = []
 
 
 
@@ -333,10 +344,11 @@ def main():
             #ani = animation.FuncAnimation(fig, animate, fargs=(frameArray, earArray),  interval=50, blit=True)
             #plt.show()
             #
+            #Saving data in a file for plotting with framenumber and EAR
             file = open("/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test.txt","a")
             file.write(str(frameNumber) + "," + str(ear) +"\n")
 
-            if(frameNumber > 60):
+            if(frameNumber > 60): #If frame number is greater than 60 remove previsous ones to show only 60 in the plot
                 with open('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test.txt', 'r') as fin:
                     data = fin.read().splitlines(True)
                 with open('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test.txt', 'w') as fout:
@@ -349,8 +361,9 @@ def main():
             #ani = animation.FuncAnimation(fig, animate, fargs=(frameArray, earArray),  interval=50)
             #plt.show()
 
-            # compute the convex hull for the left and right eye, then
-            # visualize each of the eyes
+            # compute the convex hull for the all regions, then
+            # visualize each of the regions
+            # eye, mouth, nose, full face
             leftEyeHull = cv2.convexHull(leftEye)
             rightEyeHull = cv2.convexHull(rightEye)
             mouthHull = cv2.convexHull(mouth)
@@ -362,11 +375,42 @@ def main():
             cv2.drawContours(framePose, [noseHull], -1, (0, 255, 0), 1)
             cv2.drawContours(framePose, [allHull], -1, (0, 255, 0), 1)
 
-            mouth_open = mouth_opening(mouth)
+            mouth_open = mouth_opening(mouth)  # Mouth opening area calculation functoion see line 29
             # print(mouth_open)
+            # Write in the window mouth opening calculation live
             cv2.putText(framePose,"Mouth Opening: {:.2f}".format(mouth_open), (10, 400),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
+            # check to see if the eye aspect ratio is below the blink
+            # threshold, and if so, increment the blink frame counter
+            if mouth_open > MOUTH_THRESH:
+                MCOUNTER += 1
+
+                # if the eyes were closed for a sufficient number of
+                # then sound the alarm
+                if MCOUNTER >= MOUTH_CONSEC_FRAMES:
+                    # if the alarm is not on, turn it on
+                    # if not ALARM_ON:
+                        # ALARM_ON = True
+
+                        # check to see if an alarm file was supplied,
+                        # and if so, start a thread to have the alarm
+                        # sound played in the background
+                        # if args["alarm"] != "":
+                        # t = Thread(target=sound_alarm,
+                        #         args=('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/alert.wav',))
+                        # t.deamon = True
+                        # t.start()
+
+                    # draw an alarm on the frame
+                    cv2.putText(framePose, "Please Be Attentive to Road!", (10, 50),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+
+            # otherwise, the eye aspect ratio is not below the blink
+            # threshold, so reset the counter and alarm
+            else:
+                MCOUNTER = 0
+                # ALARM_ON = False
 
             # check to see if the eye aspect ratio is below the blink
             # threshold, and if so, increment the blink frame counter
@@ -496,8 +540,8 @@ def main():
 
             #Debugging printing utilities
             if(DEBUG == True):
-                print("FACE: ", face_x1, face_y1, face_x2, face_y2, face_w, face_h)
-                print("ROI: ", roi_x1, roi_y1, roi_x2, roi_y2, roi_w, roi_h)
+                #print("FACE: ", face_x1, face_y1, face_x2, face_y2, face_w, face_h)
+                #print("ROI: ", roi_x1, roi_y1, roi_x2, roi_y2, roi_w, roi_h)
                 #Drawing a green rectangle
                 # (and text) around the face.
                 text_x1 = face_x1
@@ -576,6 +620,52 @@ def main():
                 #print('yaw = '+repr(yaw)+'\n')
                 #print('pitch = '+repr(pitch)+'\n')
                 #print('roll = '+repr(roll)+'\n')
+                #
+                #
+                #
+                #
+                #
+                yaw_straight = 78
+                pitch_straight = 30
+                yaw_angle_displacement.insert(0,abs(yaw_straight - yaw))
+                pitch_angle_displacement.insert(0,abs(pitch_straight - pitch))
+
+                yaw_mean = mean(yaw_angle_displacement[:4])
+                pitch_mean = mean(pitch_angle_displacement[:4])
+
+
+                print(yaw_mean)
+                print(pitch_mean)
+                print("")
+
+                if (yaw_mean > YAW_THRESH) or (pitch_mean > PITCH_THRESH):
+                    ypCOUNTER += 1
+
+                    # if the eyes were closed for a sufficient number of
+                    # then sound the alarm
+                    if ypCOUNTER >= HEADPOSE_CONSEC_FRAMES:
+                        # if the alarm is not on, turn it on
+                        # if not ALARM_ON:
+                            # ALARM_ON = True
+
+                            # check to see if an alarm file was supplied,
+                            # and if so, start a thread to have the alarm
+                            # sound played in the background
+                            # if args["alarm"] != "":
+                            # t = Thread(target=sound_alarm,
+                            #         args=('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/alert.wav',))
+                            # t.deamon = True
+                            # t.start()
+
+                        # draw an alarm on the frame
+                        cv2.putText(framePose, "Please Look Forward!", (10, 50),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+
+                # otherwise, the eye aspect ratio is not below the blink
+                # threshold, so reset the counter and alarm
+                else:
+                    ypCOUNTER = 0
+                    # ALARM_ON = False
 
                 cv2.putText(framePose, "YAW: {:.2f}".format(yaw), (450, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                 cv2.putText(framePose, "Pitch: {:.2f}".format(pitch), (450, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
