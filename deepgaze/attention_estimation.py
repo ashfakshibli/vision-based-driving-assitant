@@ -73,9 +73,10 @@ EYE_AR_THRESH = 0.3
 MOUTH_THRESH = 20.00
 YAW_THRESH = 6
 PITCH_THRESH = 30
-EYE_AR_CONSEC_FRAMES = 38
+EYE_AR_CONSEC_FRAMES = 30
 MOUTH_CONSEC_FRAMES = 20
-HEADPOSE_CONSEC_FRAMES = 20
+HEADPOSE_CONSEC_FRAMES = 60
+
 # initialize the frame counter as well as a boolean used to
 # indicate if the alarm is going off
 
@@ -278,13 +279,19 @@ def main():
     frameNumber = 0
     COUNTER = 0
     ALARM_ON = False
+    ALARM_ON_YP = False
 
     MCOUNTER = 0
+
 
 
     ypCOUNTER = 0
     yaw_angle_displacement = []
     pitch_angle_displacement = []
+
+    ear=0
+    mouth_open = 0
+    ypCOUNTER = 0
 
 
 
@@ -328,7 +335,7 @@ def main():
 
             # average the eye aspect ratio together for both eyes
             ear = (leftEAR + rightEAR) / 2.0
-            print(ear)
+            #print(ear)
 
             # frameNumber = frameNumber + 1
             # plotAr = np.empty(1)
@@ -345,8 +352,11 @@ def main():
             #plt.show()
             #
             #Saving data in a file for plotting with framenumber and EAR
+            #
+            percent  =  (((ear- .15)/(.40-.15))*(100))+.25
+            print(percent)
             file = open("/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test.txt","a")
-            file.write(str(frameNumber) + "," + str(ear) +"\n")
+            file.write(str(frameNumber) + "," + str(percent) +"\n")
 
             if(frameNumber > 60): #If frame number is greater than 60 remove previsous ones to show only 60 in the plot
                 with open('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test.txt', 'r') as fin:
@@ -403,7 +413,7 @@ def main():
                         # t.start()
 
                     # draw an alarm on the frame
-                    cv2.putText(framePose, "Please Be Attentive to Road!", (10, 50),
+                    cv2.putText(framePose, "Please Be Attentive to Road!", (10, 60),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
             # otherwise, the eye aspect ratio is not below the blink
@@ -446,9 +456,9 @@ def main():
             # draw the computed eye aspect ratio on the frame to help
             # with debugging and setting the correct eye aspect ratio
             # thresholds and frame counters
-            cv2.putText(framePose, "EAR: {:.2f}".format(ear), (300, 30),
+            cv2.putText(framePose, "EAR: {:.2f}".format(ear), (250, 30),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-            break
+            
 
 
 
@@ -561,6 +571,7 @@ def main():
 
                 if(DEBUG == True):
                     #cv2.drawKeypoints(framePose, landmarks_2D)
+                    print(landmarks_2D)
 
                     for point in landmarks_2D:
                         cv2.circle(framePose,( point[0], point[1] ), 2, (0,0,255), -1)
@@ -634,9 +645,9 @@ def main():
                 pitch_mean = mean(pitch_angle_displacement[:4])
 
 
-                print(yaw_mean)
-                print(pitch_mean)
-                print("")
+                # print(yaw_mean)
+                # print(pitch_mean)
+                # print("")
 
                 if (yaw_mean > YAW_THRESH) or (pitch_mean > PITCH_THRESH):
                     ypCOUNTER += 1
@@ -645,27 +656,26 @@ def main():
                     # then sound the alarm
                     if ypCOUNTER >= HEADPOSE_CONSEC_FRAMES:
                         # if the alarm is not on, turn it on
-                        # if not ALARM_ON:
-                            # ALARM_ON = True
+                        if not ALARM_ON_YP:
+                            ALARM_ON_YP = True
 
                             # check to see if an alarm file was supplied,
                             # and if so, start a thread to have the alarm
                             # sound played in the background
                             # if args["alarm"] != "":
-                            # t = Thread(target=sound_alarm,
-                            #         args=('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/alert.wav',))
-                            # t.deamon = True
-                            # t.start()
+                            t = Thread(target=sound_alarm,
+                                     args=('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/please_look_forward.mp3',))
+                            t.deamon = True
+                            t.start()
 
                         # draw an alarm on the frame
-                        cv2.putText(framePose, "Please Look Forward!", (10, 50),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                        cv2.putText(framePose, "Please Look Forward!", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
                 # otherwise, the eye aspect ratio is not below the blink
                 # threshold, so reset the counter and alarm
                 else:
                     ypCOUNTER = 0
-                    # ALARM_ON = False
+                    ALARM_ON_YP = False
 
                 cv2.putText(framePose, "YAW: {:.2f}".format(yaw), (450, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                 cv2.putText(framePose, "Pitch: {:.2f}".format(pitch), (450, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
@@ -740,6 +750,9 @@ def main():
 
         #Showing the framePose and waiting
         #cv2.imshow("Frame", frame)
+        #
+        # print(ear+mouth_open+ypCOUNTER)
+        #
         cv2.imshow("Assistant Window", framePose)
         # for the exit command
         if cv2.waitKey(1) & 0xFF == ord('q'): break

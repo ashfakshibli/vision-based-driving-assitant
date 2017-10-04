@@ -52,7 +52,7 @@ ax1 = fig.add_subplot(1,1,1)
 
 def animate(i):
 
-	EYE_AR_THRESH = 0.3
+	EYE_AR_THRESH = 70
 	EYE_AR_CONSEC_FRAMES = 48
 	COUNTER = 0
 	
@@ -77,7 +77,7 @@ def animate(i):
 			ys.append(y)
 	ax1.clear()
 	ax1.plot(xs, ys)
-	plt.axhline(y=0.30, c="red")
+	plt.axhline(y=70, c="red")
 	ax1.scatter(xs, ys, c=colors, marker="o", s=20, picker=True)
 	fig.subplots_adjust(left=0.15)
 	fig.subplots_adjust(bottom=0.15)
