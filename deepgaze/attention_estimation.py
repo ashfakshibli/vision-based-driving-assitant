@@ -292,6 +292,12 @@ def main():
     ear=0
     mouth_open = 0
     ypCOUNTER = 0
+    yaw = 0
+    pitch = 0
+    roll = 0
+    yaw_mean = 0
+    pitch_mean = 0
+    attention = 0
 
 
 
@@ -571,7 +577,7 @@ def main():
 
                 if(DEBUG == True):
                     #cv2.drawKeypoints(framePose, landmarks_2D)
-                    print(landmarks_2D)
+                    #print(landmarks_2D)
 
                     for point in landmarks_2D:
                         cv2.circle(framePose,( point[0], point[1] ), 2, (0,0,255), -1)
@@ -618,7 +624,7 @@ def main():
 
 
                 yaw = math.degrees(euler_angles[1]);
-                pitch = math.degrees(euler_angles[0]);
+                pitch = abs(math.degrees(euler_angles[0]));
                 roll = math.degrees(euler_angles[2]);
                 # yaw = math.cos(euler_angles[1]*180/math.pi)
                 # pitch = math.cos(euler_angles[0]*180/math.pi)
@@ -679,6 +685,7 @@ def main():
 
                 cv2.putText(framePose, "YAW: {:.2f}".format(yaw), (450, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                 cv2.putText(framePose, "Pitch: {:.2f}".format(pitch), (450, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                cv2.putText(framePose, "Roll: {:.2f}".format(roll), (450, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
                 # head_pose = [ rmat[0,0], rmat[0,1], rmat[0,2], tvec[0],
                 #               rmat[1,0], rmat[1,1], rmat[1,2], tvec[1],
@@ -737,7 +744,7 @@ def main():
             text_x1 = roi_x1
             text_y1 = roi_y1 - 3
             if(text_y1 < 0): text_y1 = 0
-            cv2.putText(framePose, "ROI", (text_x1,text_y1), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,255), 1);
+            cv2.putText(framePose, "", (text_x1,text_y1), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,255), 1);
             cv2.rectangle(framePose, 
                          (roi_x1, roi_y1), 
                          (roi_x2, roi_y2), 
@@ -751,8 +758,27 @@ def main():
         #Showing the framePose and waiting
         #cv2.imshow("Frame", frame)
         #
-        # print(ear+mouth_open+ypCOUNTER)
-        #
+        print(frameNumber)
+        print(ear)
+        print(mouth_open)
+        print(yaw)
+        print(pitch)
+        print(roll)
+        print(" ")
+
+
+        # percent  =  (((ear- .15)/(.40-.15))*(100))+.25
+        # print(percent)
+        # file = open("/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test.txt","a")
+        # file.write(str(frameNumber) + "," + str(percent) +"\n")
+        
+        if mouth_open != 0 and pitch_mean != 0:
+        	attention = abs(100 - (ear*100+ pitch_mean))
+
+        file = open("/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test1.txt","a")
+        file.write(str(frameNumber) + "," + str(attention) + ","+ str(ear) + "," + str(mouth_open)+ ","  + str(pitch_mean)+"\n")
+        # file.write(str(frameNumber) + "," + str(ear) + "," + str(mouth_open)+ "," + str(yaw_mean) + "," + str(roll)+ "," + str(pitch)+"\n")
+        
         cv2.imshow("Assistant Window", framePose)
         # for the exit command
         if cv2.waitKey(1) & 0xFF == ord('q'): break
