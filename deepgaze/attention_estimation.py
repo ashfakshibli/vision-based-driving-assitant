@@ -69,7 +69,7 @@ frameArray = []
 # blink and then a second constant for the number of consecutive
 # frames the eye must be below the threshold for to set off the
 # alarm
-EYE_AR_THRESH = 0.3
+EYE_AR_THRESH = 0.25
 MOUTH_THRESH = 20.00
 YAW_THRESH = 6
 PITCH_THRESH = 30
@@ -136,11 +136,12 @@ TRACKED_POINTS = (0, 4, 8, 12, 16, 17, 26, 27, 30, 33, 36, 39, 42, 45, 62)
 ALL_POINTS = list(range(0,68)) #Used for debug only
 
 video_capture = cv2.VideoCapture(1)
+# video_capture = cv2.VideoCapture('Shibli.webm')
 # time.sleep(1.0)
 
 
 
-f = open('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test.txt', 'r+')
+f = open('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test1.txt', 'r+')
 f.truncate()
 
 
@@ -282,6 +283,7 @@ def main():
     ALARM_ON_YP = False
 
     MCOUNTER = 0
+    A_COUNTER = 0
 
 
 
@@ -297,7 +299,7 @@ def main():
     roll = 0
     yaw_mean = 0
     pitch_mean = 0
-    attention = 0
+    attention = 100
 
 
 
@@ -359,16 +361,16 @@ def main():
             #
             #Saving data in a file for plotting with framenumber and EAR
             #
-            percent  =  (((ear- .15)/(.40-.15))*(100))+.25
-            print(percent)
-            file = open("/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test.txt","a")
-            file.write(str(frameNumber) + "," + str(percent) +"\n")
+            # percent  =  (((ear- .15)/(.40-.15))*(100))+.25
+            # print(percent)
+            # file = open("/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test.txt","a")
+            # file.write(str(frameNumber) + "," + str(percent) +"\n")
 
-            if(frameNumber > 60): #If frame number is greater than 60 remove previsous ones to show only 60 in the plot
-                with open('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test.txt', 'r') as fin:
-                    data = fin.read().splitlines(True)
-                with open('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test.txt', 'w') as fout:
-                    fout.writelines(data[1:])
+            # if(frameNumber > 60): #If frame number is greater than 60 remove previsous ones to show only 60 in the plot
+            #     with open('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test.txt', 'r') as fin:
+            #         data = fin.read().splitlines(True)
+            #     with open('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test.txt', 'w') as fout:
+            #         fout.writelines(data[1:])
 
             
 
@@ -404,7 +406,7 @@ def main():
 
                 # if the eyes were closed for a sufficient number of
                 # then sound the alarm
-                if MCOUNTER >= MOUTH_CONSEC_FRAMES:
+                #if MCOUNTER >= MOUTH_CONSEC_FRAMES:
                     # if the alarm is not on, turn it on
                     # if not ALARM_ON:
                         # ALARM_ON = True
@@ -419,8 +421,8 @@ def main():
                         # t.start()
 
                     # draw an alarm on the frame
-                    cv2.putText(framePose, "Please Be Attentive to Road!", (10, 60),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                    # cv2.putText(framePose, "Please Be Attentive to Road!", (10, 70),
+                    #     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
             # otherwise, the eye aspect ratio is not below the blink
             # threshold, so reset the counter and alarm
@@ -430,39 +432,39 @@ def main():
 
             # check to see if the eye aspect ratio is below the blink
             # threshold, and if so, increment the blink frame counter
-            if ear < EYE_AR_THRESH:
-                COUNTER += 1
+            # if ear < EYE_AR_THRESH:
+            #     COUNTER += 1
 
-                # if the eyes were closed for a sufficient number of
-                # then sound the alarm
-                if COUNTER >= EYE_AR_CONSEC_FRAMES:
-                    # if the alarm is not on, turn it on
-                    if not ALARM_ON:
-                        ALARM_ON = True
+            #     # if the eyes were closed for a sufficient number of
+            #     # then sound the alarm
+            #     if COUNTER >= EYE_AR_CONSEC_FRAMES:
+            #         # if the alarm is not on, turn it on
+            #         if not ALARM_ON:
+            #             ALARM_ON = False
 
-                        # check to see if an alarm file was supplied,
-                        # and if so, start a thread to have the alarm
-                        # sound played in the background
-                        # if args["alarm"] != "":
-                        t = Thread(target=sound_alarm,
-                                args=('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/alert.wav',))
-                        t.deamon = True
-                        t.start()
+            #             # check to see if an alarm file was supplied,
+            #             # and if so, start a thread to have the alarm
+            #             # sound played in the background
+            #             # if args["alarm"] != "":
+            #             t = Thread(target=sound_alarm,
+            #                     args=('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/alert.wav',))
+            #             t.deamon = True
+            #             t.start()
 
-                    # draw an alarm on the frame
-                    cv2.putText(framePose, "Attention ALERT!", (10, 30),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            #         # draw an alarm on the frame
+            #         cv2.putText(framePose, "Attention ALERT!", (10, 30),
+            #             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
-            # otherwise, the eye aspect ratio is not below the blink
-            # threshold, so reset the counter and alarm
-            else:
-                COUNTER = 0
-                ALARM_ON = False
+            # # otherwise, the eye aspect ratio is not below the blink
+            # # threshold, so reset the counter and alarm
+            # else:
+            #     COUNTER = 0
+            #     ALARM_ON = False
 
             # draw the computed eye aspect ratio on the frame to help
             # with debugging and setting the correct eye aspect ratio
             # thresholds and frame counters
-            cv2.putText(framePose, "EAR: {:.2f}".format(ear), (250, 30),
+            cv2.putText(framePose, "EAR: {:.2f}".format(ear), (450, 30),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
             
 
@@ -623,9 +625,13 @@ def main():
                 #print(euler_angles)
 
 
-                yaw = math.degrees(euler_angles[1]);
-                pitch = abs(math.degrees(euler_angles[0]));
-                roll = math.degrees(euler_angles[2]);
+                yaw = math.degrees(euler_angles[1])
+                pitch = abs(100 - abs(math.degrees(euler_angles[0])))
+                # if pitch>30:
+                # 	pitch = 30
+                # if pitch> 50:
+                # 	pitch = 35
+                roll = math.degrees(euler_angles[2])
                 # yaw = math.cos(euler_angles[1]*180/math.pi)
                 # pitch = math.cos(euler_angles[0]*180/math.pi)
                 # roll = math.cos(euler_angles[2]*180/math.pi)
@@ -683,9 +689,9 @@ def main():
                     ypCOUNTER = 0
                     ALARM_ON_YP = False
 
-                cv2.putText(framePose, "YAW: {:.2f}".format(yaw), (450, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                # cv2.putText(framePose, "YAW: {:.2f}".format(yaw), (450, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                 cv2.putText(framePose, "Pitch: {:.2f}".format(pitch), (450, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-                cv2.putText(framePose, "Roll: {:.2f}".format(roll), (450, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                # cv2.putText(framePose, "Roll: {:.2f}".format(roll), (450, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
                 # head_pose = [ rmat[0,0], rmat[0,1], rmat[0,2], tvec[0],
                 #               rmat[1,0], rmat[1,1], rmat[1,2], tvec[1],
@@ -772,11 +778,41 @@ def main():
         # file = open("/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test.txt","a")
         # file.write(str(frameNumber) + "," + str(percent) +"\n")
         
-        if mouth_open != 0 and pitch_mean != 0:
-        	attention = abs(100 - (ear*100+ pitch_mean))
+        # if mouth_open != 0 and pitch != 0:
+        # 	attention = abs(100 - (100*ear+ pitch))
+        # 	if(ear < EYE_AR_THRESH and attention >30):
+        # 		attention = attention-5
+        # 	# attention = (100/ear+ 1/pitch_mean+1/mouth_open)
+        
+        if((ear < EYE_AR_THRESH or pitch > 35 or mouth_open > 20) and attention>20):
+        	attention = attention - 3
+        else:
+        	if attention<90:
+        		attention = attention+3
 
+        if attention <30 and (not ALARM_ON):
+        	A_COUNTER += 1
+
+        	cv2.putText(framePose, "Attention ALERT!", (10, 30),cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+        	if A_COUNTER > 10: 
+		        ALARM_ON = True
+
+		        # check to see if an alarm file was supplied,
+		        # and if so, start a thread to have the alarm
+		        # sound played in the background
+		        # if args["alarm"] != "":
+		        t = Thread(target=sound_alarm,
+		                args=('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/alert.wav',))
+		        t.deamon = True
+		        t.start()
+
+
+        else:
+        	A_COUNTER = 0
+        	ALARM_ON = False
+        cv2.putText(framePose, "Attention: {:.1f}".format(attention), (250, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
         file = open("/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test1.txt","a")
-        file.write(str(frameNumber) + "," + str(attention) + ","+ str(ear) + "," + str(mouth_open)+ ","  + str(pitch_mean)+"\n")
+        file.write(str(frameNumber) + "," + str(attention) + ","+ str(ear) + "," + str(mouth_open)+ ","  + str(pitch)+"\n")
         # file.write(str(frameNumber) + "," + str(ear) + "," + str(mouth_open)+ "," + str(yaw_mean) + "," + str(roll)+ "," + str(pitch)+"\n")
         
         cv2.imshow("Assistant Window", framePose)
