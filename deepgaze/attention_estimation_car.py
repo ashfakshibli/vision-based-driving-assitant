@@ -141,7 +141,7 @@ video_capture = cv2.VideoCapture('Shibli.webm')
 
 
 
-f = open('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test.txt', 'r+')
+f = open('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test1.txt', 'r+')
 f.truncate()
 
 
@@ -463,7 +463,7 @@ def main():
             # draw the computed eye aspect ratio on the frame to help
             # with debugging and setting the correct eye aspect ratio
             # thresholds and frame counters
-            cv2.putText(framePose, "EAR: {:.2f}".format(ear), (250, 30),
+            cv2.putText(framePose, "EAR: {:.2f}".format(ear), (450, 30),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
             
 
@@ -688,7 +688,7 @@ def main():
                     ypCOUNTER = 0
                     ALARM_ON_YP = False
 
-                cv2.putText(framePose, "YAW: {:.2f}".format(yaw), (450, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                # cv2.putText(framePose, "YAW: {:.2f}".format(yaw), (450, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                 cv2.putText(framePose, "Pitch: {:.2f}".format(pitch), (450, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                 # cv2.putText(framePose, "Roll: {:.2f}".format(roll), (450, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
@@ -783,11 +783,35 @@ def main():
         # 		attention = attention-5
         # 	# attention = (100/ear+ 1/pitch_mean+1/mouth_open)
         
-        if((ear < EYE_AR_THRESH or pitch > 27) and attention>20):
+        if((ear < EYE_AR_THRESH or pitch > 27 or mouth_open > 30) and attention>20):
         	attention = attention - 3
         else:
         	if attention<90:
         		attention = attention+3
+        if attention <30:
+            A_COUNTER += 1
+
+            
+            if A_COUNTER > 10:
+                cv2.putText(framePose, "Attention ALERT!", (10, 30),cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                if not ALARM_ON: 
+                    ALARM_ON = True
+
+                    # check to see if an alarm file was supplied,
+                    # and if so, start a thread to have the alarm
+                    # sound played in the background
+                    # if args["alarm"] != "":
+                    t = Thread(target=sound_alarm,
+                            args=('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/alert.wav',))
+                    t.deamon = True
+                    t.start()
+
+
+
+        else:
+            A_COUNTER = 0
+            ALARM_ON = False
+        cv2.putText(framePose, "Attention: {:.1f}".format(attention), (250, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
 
         file = open("/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test1.txt","a")
