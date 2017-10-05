@@ -790,21 +790,24 @@ def main():
         	if attention<90:
         		attention = attention+3
 
-        if attention <30 and (not ALARM_ON):
+        if attention <30:
         	A_COUNTER += 1
 
-        	cv2.putText(framePose, "Attention ALERT!", (10, 30),cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-        	if A_COUNTER > 10: 
-		        ALARM_ON = True
+        	
+        	if A_COUNTER > 10:
+        		cv2.putText(framePose, "Attention ALERT!", (10, 30),cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+        		if not ALARM_ON: 
+			        ALARM_ON = True
 
-		        # check to see if an alarm file was supplied,
-		        # and if so, start a thread to have the alarm
-		        # sound played in the background
-		        # if args["alarm"] != "":
-		        t = Thread(target=sound_alarm,
-		                args=('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/alert.wav',))
-		        t.deamon = True
-		        t.start()
+			        # check to see if an alarm file was supplied,
+			        # and if so, start a thread to have the alarm
+			        # sound played in the background
+			        # if args["alarm"] != "":
+			        t = Thread(target=sound_alarm,
+			                args=('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/alert.wav',))
+			        t.deamon = True
+			        t.start()
+
 
 
         else:
