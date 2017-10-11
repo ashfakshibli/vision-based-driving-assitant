@@ -136,7 +136,7 @@ TRACKED_POINTS = (0, 4, 8, 12, 16, 17, 26, 27, 30, 33, 36, 39, 42, 45, 62)
 ALL_POINTS = list(range(0,68)) #Used for debug only
 
 # video_capture = cv2.VideoCapture(1)
-video_capture = cv2.VideoCapture('Shibli.webm')
+video_capture = cv2.VideoCapture('Videos/Shibli.webm')
 # time.sleep(1.0)
 
 
@@ -395,8 +395,8 @@ def main():
             mouth_open = mouth_opening(mouth)  # Mouth opening area calculation functoion see line 29
             # print(mouth_open)
             # Write in the window mouth opening calculation live
-            cv2.putText(framePose,"Mouth Opening: {:.2f}".format(mouth_open), (10, 400),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            cv2.putText(framePose,"Mouth: {:.2f}".format(mouth_open), (450, 70),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (50, 255, 74), 2)
 
             # check to see if the eye aspect ratio is below the blink
             # threshold, and if so, increment the blink frame counter
@@ -431,40 +431,40 @@ def main():
 
             # check to see if the eye aspect ratio is below the blink
             # threshold, and if so, increment the blink frame counter
-            if ear < EYE_AR_THRESH:
-                COUNTER += 1
+            # if ear < EYE_AR_THRESH:
+            #     COUNTER += 1
 
-                # if the eyes were closed for a sufficient number of
-                # then sound the alarm
-                if COUNTER >= EYE_AR_CONSEC_FRAMES:
-                    # if the alarm is not on, turn it on
-                    if not ALARM_ON:
-                        ALARM_ON = True
+            #     # if the eyes were closed for a sufficient number of
+            #     # then sound the alarm
+            #     if COUNTER >= EYE_AR_CONSEC_FRAMES:
+            #         # if the alarm is not on, turn it on
+            #         if not ALARM_ON:
+            #             ALARM_ON = True
 
-                        # check to see if an alarm file was supplied,
-                        # and if so, start a thread to have the alarm
-                        # sound played in the background
-                        # if args["alarm"] != "":
-                        t = Thread(target=sound_alarm,
-                                args=('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/alert.wav',))
-                        t.deamon = True
-                        t.start()
+            #             # check to see if an alarm file was supplied,
+            #             # and if so, start a thread to have the alarm
+            #             # sound played in the background
+            #             # if args["alarm"] != "":
+            #             t = Thread(target=sound_alarm,
+            #                     args=('/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/alert.wav',))
+            #             t.deamon = True
+            #             t.start()
 
-                    # draw an alarm on the frame
-                    cv2.putText(framePose, "Attention ALERT!", (10, 30),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            #         # draw an alarm on the frame
+            #         cv2.putText(framePose, "Attention ALERT!", (10, 30),
+            #             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
-            # otherwise, the eye aspect ratio is not below the blink
-            # threshold, so reset the counter and alarm
-            else:
-                COUNTER = 0
-                ALARM_ON = False
+            # # otherwise, the eye aspect ratio is not below the blink
+            # # threshold, so reset the counter and alarm
+            # else:
+            #     COUNTER = 0
+            #     ALARM_ON = False
 
             # draw the computed eye aspect ratio on the frame to help
             # with debugging and setting the correct eye aspect ratio
             # thresholds and frame counters
             cv2.putText(framePose, "EAR: {:.2f}".format(ear), (450, 30),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (50, 255, 74), 2)
             
 
 
@@ -626,10 +626,10 @@ def main():
 
                 yaw = math.degrees(euler_angles[1])
                 pitch = abs(math.degrees(euler_angles[0]))
-                if pitch>30:
-                	pitch = 30
-                if pitch> 50:
-                	pitch = 35
+                if pitch>100:
+                	pitch = pitch - 100
+                # if pitch> 45:
+                # 	pitch = 35
                 roll = math.degrees(euler_angles[2])
                 # yaw = math.cos(euler_angles[1]*180/math.pi)
                 # pitch = math.cos(euler_angles[0]*180/math.pi)
@@ -689,7 +689,7 @@ def main():
                     ALARM_ON_YP = False
 
                 # cv2.putText(framePose, "YAW: {:.2f}".format(yaw), (450, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-                cv2.putText(framePose, "Pitch: {:.2f}".format(pitch), (450, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                cv2.putText(framePose, "Pitch: {:.2f}".format(pitch), (450, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (50, 255, 74), 2)
                 # cv2.putText(framePose, "Roll: {:.2f}".format(roll), (450, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
                 # head_pose = [ rmat[0,0], rmat[0,1], rmat[0,2], tvec[0],
@@ -783,7 +783,7 @@ def main():
         # 		attention = attention-5
         # 	# attention = (100/ear+ 1/pitch_mean+1/mouth_open)
         
-        if((ear < EYE_AR_THRESH or pitch > 27 or mouth_open > 30) and attention>20):
+        if((ear < EYE_AR_THRESH or pitch > 35 or mouth_open > 30) and attention>20):
         	attention = attention - 3
         else:
         	if attention<90:
@@ -792,7 +792,7 @@ def main():
             A_COUNTER += 1
 
             
-            if A_COUNTER > 10:
+            if A_COUNTER > 20:
                 cv2.putText(framePose, "Attention ALERT!", (10, 30),cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                 if not ALARM_ON: 
                     ALARM_ON = True
@@ -811,7 +811,7 @@ def main():
         else:
             A_COUNTER = 0
             ALARM_ON = False
-        cv2.putText(framePose, "Attention: {:.1f}".format(attention), (250, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+        cv2.putText(framePose, "Attention: {:.1f}".format(attention), (250, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (50, 255, 74), 2)
 
 
         file = open("/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test1.txt","a")

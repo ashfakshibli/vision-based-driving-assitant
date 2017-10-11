@@ -135,7 +135,7 @@ P3D_STOMION = np.float32([10.0, 0.0, -75.0]) #62
 TRACKED_POINTS = (0, 4, 8, 12, 16, 17, 26, 27, 30, 33, 36, 39, 42, 45, 62)
 ALL_POINTS = list(range(0,68)) #Used for debug only
 
-video_capture = cv2.VideoCapture(1)
+video_capture = cv2.VideoCapture(0)
 # video_capture = cv2.VideoCapture('Shibli.webm')
 # time.sleep(1.0)
 
@@ -396,8 +396,8 @@ def main():
             mouth_open = mouth_opening(mouth)  # Mouth opening area calculation functoion see line 29
             # print(mouth_open)
             # Write in the window mouth opening calculation live
-            cv2.putText(framePose,"Mouth Opening: {:.2f}".format(mouth_open), (10, 400),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            cv2.putText(framePose,"Mouth: {:.2f}".format(mouth_open), (450, 70),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (50, 255, 74), 2)
 
             # check to see if the eye aspect ratio is below the blink
             # threshold, and if so, increment the blink frame counter
@@ -465,7 +465,7 @@ def main():
             # with debugging and setting the correct eye aspect ratio
             # thresholds and frame counters
             cv2.putText(framePose, "EAR: {:.2f}".format(ear), (450, 30),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (50, 255, 74), 2)
             
 
 
@@ -690,7 +690,7 @@ def main():
                     ALARM_ON_YP = False
 
                 # cv2.putText(framePose, "YAW: {:.2f}".format(yaw), (450, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-                cv2.putText(framePose, "Pitch: {:.2f}".format(pitch), (450, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                cv2.putText(framePose, "Pitch: {:.2f}".format(pitch), (450, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (50, 255, 74), 2)
                 # cv2.putText(framePose, "Roll: {:.2f}".format(roll), (450, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
                 # head_pose = [ rmat[0,0], rmat[0,1], rmat[0,2], tvec[0],
@@ -813,7 +813,7 @@ def main():
         else:
         	A_COUNTER = 0
         	ALARM_ON = False
-        cv2.putText(framePose, "Attention: {:.1f}".format(attention), (250, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+        cv2.putText(framePose, "Attention: {:.1f}".format(attention), (250, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (050, 255, 74), 2)
         file = open("/home/ashfak/Desktop/DriversAssistanceSystem/deepgaze/FaceProject/test1.txt","a")
         file.write(str(frameNumber) + "," + str(attention) + ","+ str(ear) + "," + str(mouth_open)+ ","  + str(pitch)+"\n")
         # file.write(str(frameNumber) + "," + str(ear) + "," + str(mouth_open)+ "," + str(yaw_mean) + "," + str(roll)+ "," + str(pitch)+"\n")
