@@ -136,7 +136,7 @@ TRACKED_POINTS = (0, 4, 8, 12, 16, 17, 26, 27, 30, 33, 36, 39, 42, 45, 62)
 ALL_POINTS = list(range(0,68)) #Used for debug only
 
 # video_capture = cv2.VideoCapture(1)
-video_capture = cv2.VideoCapture('Videos/Mama-Driver.webm')
+video_capture = cv2.VideoCapture('Videos/Participant_1.mp4')
 # time.sleep(1.0)
 
 
