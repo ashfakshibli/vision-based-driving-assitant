@@ -1,5 +1,9 @@
 # Vision-Based Driving Assistance System
 
+- ### Real world test in a [video](https://youtu.be/Y_C6IK8MG1k)
+- ### Springer paper [here](https://link.springer.com/chapter/10.1007/978-981-13-1951-8_71) 
+- ### Full [PDF](https://www.researchgate.net/profile/Ashfak-Shibli/publication/329605031_Developing_a_Vision-Based_Driving_Assistance_System_Proceedings_of_IEMIS_2018_Volume_1/links/61b6b43b1d88475981e6b640/Developing-a-Vision-Based-Driving-Assistance-System-Proceedings-of-IEMIS-2018-Volume-1.pdf)
+
 ### Abstract
 Driver’s inattention and distraction are the most prominent reasons for
 road accidents. Since a fraction of second distraction may cause a severe accident
